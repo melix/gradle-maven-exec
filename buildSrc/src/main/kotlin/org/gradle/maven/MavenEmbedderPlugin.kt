@@ -20,14 +20,16 @@ class MavenEmbedderPlugin : Plugin<Project> {
             isCanBeResolved = true
         }
 
-        // http://mirrors.standaloneinstaller.com/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.zip
-        repositories.ivy("maven-distributions") {
-            setUrl("http://mirrors.standaloneinstaller.com/apache/maven/maven-3/")
-            patternLayout {
-                artifact("[revision]/binaries/[artifact]-[revision]-bin(.[ext])")
-            }
-            content {
-                onlyForConfigurations("maven")
+        afterEvaluate {
+            // http://mirrors.standaloneinstaller.com/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.zip
+            repositories.ivy("maven-distributions") {
+                setUrl(extension.repositoryUrl)
+                patternLayout {
+                    artifact("[revision]/binaries/[artifact]-[revision]-bin(.[ext])")
+                }
+                content {
+                    onlyForConfigurations("maven")
+                }
             }
         }
 
