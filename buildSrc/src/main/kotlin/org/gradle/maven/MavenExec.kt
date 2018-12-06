@@ -5,6 +5,7 @@ import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
+import org.gradle.kotlin.dsl.listProperty
 import org.gradle.process.CommandLineArgumentProvider
 import java.lang.IllegalStateException
 
@@ -13,7 +14,7 @@ open class MavenExec : Exec {
         group = "Maven tasks"
         setExecutable(ExecutableProvider())
         argumentProviders.add(CommandLineArgumentProvider {
-            listOf(taskName)
+            tasks.get()
         })
     }
 
@@ -29,7 +30,9 @@ open class MavenExec : Exec {
     }
 
     @get:Input
-    var taskName: String? = null
+    val tasks = project.objects.listProperty<String>().also {
+        it.set(mutableListOf(name))
+    }
 
     inner class ExecutableProvider {
         val mavenExtension by lazy {

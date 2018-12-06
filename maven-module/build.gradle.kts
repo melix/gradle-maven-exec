@@ -8,10 +8,6 @@ maven {
    version = "3.5.4"
 }
 
-tasks.register<MavenExec>("clean") {
-   taskName = "clean"
-}
+val clean by tasks.registering(MavenExec::class)
 
-tasks.register<MavenExec>("install") {
-   taskName = "install"
-}
+val install by tasks.registering(MavenExec::class)
