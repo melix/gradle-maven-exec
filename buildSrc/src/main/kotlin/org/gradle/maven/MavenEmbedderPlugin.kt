@@ -38,6 +38,14 @@ class MavenEmbedderPlugin : Plugin<Project> {
             to.attribute(Attribute.of("artifactType", String::class.java), "exploded")
             artifactTransform(ExplodeZip::class.java)
         }
+
+        tasks.addRule("Pattern: maven<Task>") {
+            val mavenTask = this.substring(5).decapitalize()
+            tasks.register(this, MavenExec::class.java) {
+                tasks.set(listOf(mavenTask))
+            }
+        }
+
         afterEvaluate {
             mavenConfiguration.dependencies.add(project.dependencies.create("maven:apache-maven:${extension.version}@zip"))
         }
