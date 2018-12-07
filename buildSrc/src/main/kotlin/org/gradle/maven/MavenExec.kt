@@ -3,19 +3,20 @@ package org.gradle.maven
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
 import org.gradle.kotlin.dsl.listProperty
 import org.gradle.process.CommandLineArgumentProvider
-import java.lang.IllegalStateException
 
 open class MavenExec : Exec {
     constructor() : super() {
         group = "Maven tasks"
         setExecutable(ExecutableProvider())
         argumentProviders.add(CommandLineArgumentProvider {
-            tasks.get()
+            goals.get()
         })
+        doFirst {
+            project.logger.lifecycle("Executing Maven goals ${goals.get()}")
+        }
     }
 
     @InputFiles
@@ -25,12 +26,13 @@ open class MavenExec : Exec {
         }
     }.files
 
+    private
     val mavenHome by lazy {
         getMavenDistribution().singleFile
     }
 
     @get:Input
-    val tasks = project.objects.listProperty<String>().also {
+    val goals = project.objects.listProperty<String>().also {
         it.set(mutableListOf(name))
     }
 

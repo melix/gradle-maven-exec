@@ -6,7 +6,6 @@ import org.gradle.api.artifacts.transform.ArtifactTransform
 import org.gradle.api.attributes.Attribute
 import org.gradle.kotlin.dsl.ivy
 import java.io.File
-import java.net.URI
 import java.util.zip.ZipFile
 
 class MavenEmbedderPlugin : Plugin<Project> {
@@ -39,10 +38,10 @@ class MavenEmbedderPlugin : Plugin<Project> {
             artifactTransform(ExplodeZip::class.java)
         }
 
-        tasks.addRule("Pattern: maven<Task>") {
-            val mavenTask = this.substring(5).decapitalize()
+        tasks.addRule("Pattern: <mavenTaskList>") {
+            val mavenTasks = this.split(Regex("(?=[A-Z])")).map(String::decapitalize)
             tasks.register(this, MavenExec::class.java) {
-                tasks.set(listOf(mavenTask))
+                goals.set(mavenTasks)
             }
         }
 
