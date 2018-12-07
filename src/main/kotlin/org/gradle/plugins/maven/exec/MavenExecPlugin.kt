@@ -4,7 +4,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.transform.ArtifactTransform
 import org.gradle.api.attributes.Attribute
-import org.gradle.kotlin.dsl.ivy
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -20,12 +19,8 @@ class MavenExecPlugin : Plugin<Project> {
         }
 
         afterEvaluate {
-            // http://mirrors.standaloneinstaller.com/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.zip
-            repositories.ivy("maven-distributions") {
-                setUrl(extension.repositoryUrl)
-                patternLayout {
-                    artifact("[revision]/binaries/[artifact]-[revision]-bin(.[ext])")
-                }
+            repositories.maven {
+                url = uri(extension.repositoryUrl)
             }
         }
 
@@ -43,7 +38,7 @@ class MavenExecPlugin : Plugin<Project> {
         }
 
         afterEvaluate {
-            mavenConfiguration.dependencies.add(project.dependencies.create("maven:apache-maven:${extension.version}@zip"))
+            mavenConfiguration.dependencies.add(project.dependencies.create("org.apache.maven:apache-maven:${extension.version}:bin@zip"))
         }
     }
 }
