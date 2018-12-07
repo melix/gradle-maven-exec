@@ -32,10 +32,6 @@ object MavenExecPluginFunctionalTest : Spek({
                     id 'gradle.maven.exec'
                 }
 
-                maven {
-                    version = '3.5.4'
-                }
-
                 task $mavenInstallGoal(type: org.gradle.plugins.maven.exec.MavenExec)
 
                 task $mavenValidateGoal(type: org.gradle.plugins.maven.exec.MavenExec) {
@@ -46,12 +42,11 @@ object MavenExecPluginFunctionalTest : Spek({
             val pomXml = Files.createFile(testProjectDir.resolve("pom.xml")).toFile()
             pomXml.writeText(pomContent)
 
-            it("succeeds if valid pom.xml") {
+            it("executes specified maven goal") {
                 val buildResult = execute(testProjectDir.toFile(), mavenInstallGoal, "-s")
 
                 assertEquals(buildResult.task(":$mavenInstallGoal")!!.outcome, TaskOutcome.SUCCESS)
-                println(testProjectDir.root.toAbsolutePath())
-                // TODO: assert contents of something
+                assertTrue(testProjectDir.resolve("target/my-app-1.0-SNAPSHOT.jar").toFile().exists())
             }
 
             it("allows multiple maven goals to be executed") {
