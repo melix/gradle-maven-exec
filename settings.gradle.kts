@@ -1,5 +1,1 @@
-rootProject.name = "embed-maven"
-
-include("maven-module")
-
-
+rootProject.name = "maven-exec-plugin"

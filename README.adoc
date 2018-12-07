@@ -1,0 +1,17 @@
+= Gradle Maven Exec Plugin — Execute Maven from Gradle
+
+== Usage
+
+IMPORTANT: The plugin requires a Gradle version of 5.0 or higher.
+
+```
+plugins {
+    id("gradle.maven.exec").version("0.0.1")
+}
+
+maven {
+    version = "3.6.0"
+}
+
+task install(type: org.gradle.plugins.maven.exec.MavenExec)
+```

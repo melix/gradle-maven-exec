@@ -1,4 +1,4 @@
-package org.gradle.maven
+package org.gradle.plugins.maven.exec
 
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.tasks.Exec
