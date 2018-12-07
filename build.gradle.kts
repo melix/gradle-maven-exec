@@ -42,6 +42,8 @@ kotlinDslPluginOptions {
     experimentalWarning.set(false)
 }
 
+sourceSets.test.get().resources.srcDirs("src/test/samples")
+
 val sourcesJar by tasks.registering(Jar::class) {
     group = JavaBasePlugin.DOCUMENTATION_GROUP
     description = "Assembles sources JAR"
