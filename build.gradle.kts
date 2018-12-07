@@ -16,7 +16,7 @@ val junitPlatformVersion = "1.1.0"
 val spekVersion = "2.0.0-rc.1"
 
 group = "org.gradle.plugins"
-version = "0.0.1"
+version = "0.0.2"
 description = "Invoke Maven from Gradle"
 
 val webUrl = "https://melix.github.io/${project.name}/"
@@ -79,10 +79,14 @@ tasks {
 
 repositories {
     jcenter()
+    maven {
+        url = uri("https://repo.gradle.org/gradle/libs")
+    }
 }
 
 dependencies {
     testImplementation(kotlin("test"))
+    testImplementation("org.gradle:sample-check:0.6.1")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion") {
         exclude(group = "org.jetbrains.kotlin")
     }

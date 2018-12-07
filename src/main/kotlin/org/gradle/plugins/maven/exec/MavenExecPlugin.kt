@@ -35,13 +35,7 @@ class MavenExecPlugin : Plugin<Project> {
             artifactTransform(ExplodeZip::class.java)
         }
 
-        // TODO: figure out a better way to invoke Maven goals
-        // Keep in mind ":" in maven goals
-        // Keep in mind multiple goals + possibly arguments (-P)
-        // Keep in mind other Gradle tasks may be defined ... but maybe Gradle matches that first anyway... still "gradle clean" probably already exists so what to do about that?
-
         tasks.addRule("Pattern: <mavenTaskList>") {
-//          val mavenTask = this.substring(5).decapitalize()
             val mavenTasks = this.split(Regex("(?=[A-Z])")).map(String::decapitalize)
             tasks.register(this, MavenExec::class.java) {
                 goals.set(mavenTasks)

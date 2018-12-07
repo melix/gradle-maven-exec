@@ -32,6 +32,10 @@ object MavenExecPluginFunctionalTest : Spek({
                     id 'gradle.maven.exec'
                 }
 
+                maven {
+                    version = "3.6.0"
+                }
+
                 task $mavenInstallGoal(type: org.gradle.plugins.maven.exec.MavenExec)
 
                 task $mavenValidateGoal(type: org.gradle.plugins.maven.exec.MavenExec) {
@@ -54,8 +58,6 @@ object MavenExecPluginFunctionalTest : Spek({
 
                 assertEquals(buildResult.task(":clean")!!.outcome, TaskOutcome.SUCCESS)
             }
-
-            xit("uses Maven wrapper if present") {}
 
             it("forwards maven arguments to Maven execution") {
                 val buildResult = execute(testProjectDir.toFile(), mavenValidateGoal, "-s")
