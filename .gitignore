@@ -8,6 +8,10 @@
 /subprojects/docs/src/samples/**/build
 /subprojects/internal-android-performance-testing/build-android-libs
 
+# Maven
+# ------
+/src/test/samples/*/target
+
 # IDEA
 # ----
 !/.idea
