@@ -7,6 +7,7 @@ import org.spekframework.spek2.style.specification.describe
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 object MavenExecPluginFunctionalTest : Spek({
     describe("MavenExecPlugin") {
@@ -21,9 +22,10 @@ object MavenExecPluginFunctionalTest : Spek({
 
         context("with configured maven exec plugin") {
             val testProjectDir = Files.createTempDirectory("maven_exec_plugin_test")
-            val mavenOutputLocation = testProjectDir.resolve("target").toFile()
             val buildFile = Files.createFile(testProjectDir.resolve("build.gradle")).toFile()
-            val mavenGoalName = "install"
+            val mavenInstallGoal = "install"
+            val mavenValidateGoal = "validate"
+            val mavenValidateLogFileName = "maven-validate.log"
 
             buildFile.writeText("""
                 plugins {
@@ -34,38 +36,20 @@ object MavenExecPluginFunctionalTest : Spek({
                     version = '3.5.4'
                 }
 
-                task $mavenGoalName(type: org.gradle.plugins.maven.exec.MavenExec)
+                task $mavenInstallGoal(type: org.gradle.plugins.maven.exec.MavenExec)
+
+                task $mavenValidateGoal(type: org.gradle.plugins.maven.exec.MavenExec) {
+                    args = ["--log-file", "$mavenValidateLogFileName"]
+                }
             """.trimIndent())
 
             val pomXml = Files.createFile(testProjectDir.resolve("pom.xml")).toFile()
-            pomXml.writeText("""
-                    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                      xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                      <modelVersion>4.0.0</modelVersion>
-
-                      <groupId>com.mycompany.app</groupId>
-                      <artifactId>my-app</artifactId>
-                      <version>1.0-SNAPSHOT</version>
-
-                      <properties>
-                        <maven.compiler.source>1.8</maven.compiler.source>
-                        <maven.compiler.target>1.8</maven.compiler.target>
-                      </properties>
-
-                      <dependencies>
-                        <dependency>
-                          <groupId>commons-io</groupId>
-                          <artifactId>commons-io</artifactId>
-                          <version>2.6</version>
-                        </dependency>
-                      </dependencies>
-                    </project>
-                    """.trimIndent())
+            pomXml.writeText(pomContent)
 
             it("succeeds if valid pom.xml") {
-                val buildResult = execute(testProjectDir.toFile(), mavenGoalName, "-s")
+                val buildResult = execute(testProjectDir.toFile(), mavenInstallGoal, "-s")
 
-                assertEquals(buildResult.task(":$mavenGoalName")!!.outcome, TaskOutcome.SUCCESS)
+                assertEquals(buildResult.task(":$mavenInstallGoal")!!.outcome, TaskOutcome.SUCCESS)
                 println(testProjectDir.root.toAbsolutePath())
                 // TODO: assert contents of something
             }
@@ -77,7 +61,45 @@ object MavenExecPluginFunctionalTest : Spek({
             }
 
             xit("uses Maven wrapper if present") {}
-            xit("forwards arguments to Maven execution") {}
+
+            it("forwards maven arguments to Maven execution") {
+                val buildResult = execute(testProjectDir.toFile(), mavenValidateGoal, "-s")
+
+                assertEquals(buildResult.task(":$mavenValidateGoal")!!.outcome, TaskOutcome.SUCCESS)
+                assertTrue(testProjectDir.resolve(mavenValidateLogFileName).toFile().exists())
+            }
+
+            it("forwards maven arguments to Maven from CLI") {
+                val logFileName = "maven-clean.log"
+                val buildResult = execute(testProjectDir.toFile(), "clean", "--maven-args=--log-file $logFileName")
+
+                assertEquals(buildResult.task(":clean")!!.outcome, TaskOutcome.SUCCESS)
+                assertTrue(testProjectDir.resolve(logFileName).toFile().exists())
+            }
         }
     }
 })
+
+const val pomContent = """
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.mycompany.app</groupId>
+  <artifactId>my-app</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.6</version>
+    </dependency>
+  </dependencies>
+</project>
+"""

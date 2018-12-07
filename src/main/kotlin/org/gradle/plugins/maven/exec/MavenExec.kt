@@ -4,6 +4,7 @@ import org.gradle.api.attributes.Attribute
 import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.options.Option
 import org.gradle.kotlin.dsl.listProperty
 import org.gradle.process.CommandLineArgumentProvider
 
@@ -17,6 +18,11 @@ open class MavenExec : Exec {
         doFirst {
             project.logger.lifecycle("Executing Maven goals ${goals.get()}")
         }
+    }
+
+    @Option(option = "maven-args", description = "argument to forward to Maven execution")
+    fun setMavenArgs(args: String) {
+        setArgs(args.split("\\s".toRegex()))
     }
 
     @InputFiles
@@ -37,11 +43,12 @@ open class MavenExec : Exec {
     }
 
     inner class ExecutableProvider {
+        private
         val mavenExtension by lazy {
             project.extensions.findByType(MavenExtension::class.java)
         }
 
         override
-        fun toString() = "${mavenHome}/apache-maven-${mavenExtension!!.version}/bin/mvn"
+        fun toString() = "$mavenHome/apache-maven-${mavenExtension!!.version}/bin/mvn"
     }
 }
