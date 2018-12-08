@@ -4,7 +4,7 @@ import org.gradle.kotlin.dsl.version
 import org.gradle.plugins.maven.exec.MavenExec
 
 plugins {
-   id("gradle.maven.exec") version "0.0.2"
+   id("gradle.maven.exec") version "0.0.7"
 }
 
 val clean by tasks.registering(MavenExec::class)

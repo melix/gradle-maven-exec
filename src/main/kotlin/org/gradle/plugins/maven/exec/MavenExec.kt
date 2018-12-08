@@ -51,10 +51,13 @@ open class MavenExec : Exec {
         override
         fun toString(): String {
             val osName: String = System.getProperty("os.name").toLowerCase()
-            return if (osName.contains("win") && project.layout.projectDirectory.file("mvnw.bat").asFile.canExecute()) {
-                "mvnw.bat"
-            } else if (project.layout.projectDirectory.file("mvnw").asFile.canExecute()) {
-                "mvnw"
+            val mvnwBatFile = project.layout.projectDirectory.file("mvnw.bat").asFile
+            val mvnwBinFile = project.layout.projectDirectory.file("mvnw").asFile
+
+            return if (osName.contains("win") && mvnwBatFile.canExecute()) {
+                mvnwBatFile.canonicalPath
+            } else if (mvnwBinFile.canExecute()) {
+                mvnwBinFile.canonicalPath
             } else {
                 "$mavenHome/apache-maven-${mavenExtension!!.version}/bin/mvn"
             }
